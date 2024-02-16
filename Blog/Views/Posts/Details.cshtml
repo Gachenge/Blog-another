@@ -1,0 +1,113 @@
+﻿@using System.Security.Claims
+@model Post
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<hr />
+
+<div class="card border-dark mb-3">
+    <div class="card-body text-info">
+        <div class="container text-center">
+            <h5 class="card-title">@Html.DisplayFor(model => model.Title)</h5>
+            <div class="row">
+                <div class="col-8">
+                    @Html.DisplayFor(model => model.Body)
+                </div>
+                <div class="col">
+                    @if (Model.Author != null && !string.IsNullOrEmpty(Model.Author.Avatar))
+                    {
+                        var avatarPath = "/avatars/" + Model.Author.Id + "_avatar.jpg";
+                        <img src="@avatarPath" alt="User Profile" class="rounded-circle float-left" />
+                    }
+                    else
+                    {
+                        <img src="/avatars/default-avatar.jpg" alt="Default Profile" class="rounded-circle float-left" />
+                    }
+                    By: @Html.DisplayFor(model => model.Author.UserName)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<!-- Display Comments Section -->
+<div>
+    <h4>Comments</h4>
+
+    @foreach (var comment in Model.Comments)
+    {
+        <div class="card border-dark mb-3">
+            <div class="card-body text-success">
+                <p>@comment.Body</p>
+                <p>
+                    @if (comment.Author != null)
+                    {
+                        <span>By: @comment.Author.UserName</span>
+                    }
+                    else
+                    {
+                        <span>By: [Unknown]</span>
+                    }
+                </p>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                @if (comment.AuthorId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                {
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-info mr-2" data-toggle="modal" data-target="#editCommentModal"
+                                data-comment-id="@comment.Id" data-comment-body="@comment.Body">
+                            Edit Comment
+                        </button>
+                        <form asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.Id" method="post">
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure to delete?')">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+        <hr />
+
+        <!-- Modal for Comment Editing -->
+        <div class="modal" id="editCommentModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Comment</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Form for editing the comment -->
+                        <form asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" method="post">
+                            <input type="hidden" id="commentId" name="commentId" value="@comment.Id" />
+                            <input type="hidden" id="postId" name="postId" value="@Model.Id" />
+                            <div class="form-group">
+                                <label for="editedComment">Edited Comment:</label>
+                                <input type="text" id="editedComment" name="body" class="form-control" value="@comment.Body" />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+    <form asp-action="AddComment" method="post">
+        <input type="hidden" name="postId" value="@Model.Id" />
+        <div class="form-group">
+            <label for="comment-body">Comment:</label>
+            <input type="text" name="body" class="form-control comment-body" placeholder="Add your reaction" />
+            <br />
+            <button type="submit" class="btn btn-outline-primary">Add Comment</button>
+        </div>
+    </form>
+</div>

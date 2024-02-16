@@ -1,0 +1,42 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout))
+    {
+        Layout = (string)parentLayout;
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+}
+
+<h2>Manage your account</h2>
+
+<div>
+    <h4>Change your account settings</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-3">
+            <partial name="_ManageNav" />
+        </div>
+        <div class="col-md-6">
+            @RenderBody()
+        </div>
+        <div class="col-md">
+            @if (User?.FindFirst("Avatar") != null)
+            {
+                var avatarClaim = User.FindFirst("Avatar");
+                <img src="@avatarClaim.Value" alt="avatar" class="img-fluid" />
+            }
+            else
+            {
+                <img src="~/avatars/default-avatar.jpg" alt="Default Avatar" class="img-fluid" />
+            }
+            <a class="btn btn-secondary btn-sm" asp-page="/Account/Manage/_UpdateProfilePicture">Update Profile Picture</a>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

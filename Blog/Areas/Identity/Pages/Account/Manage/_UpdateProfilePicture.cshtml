@@ -1,0 +1,24 @@
+﻿@page
+@model Blog.Areas.Identity.Pages.Account.Manage._UpdateProfilePictureModel
+@{
+    <h4>Update Profile Picture</h4>
+    <form enctype="multipart/form-data" method="post" asp-action="">
+        @Html.AntiForgeryToken()
+        <input type="file" name="profilePicture" accept="image/*" />
+        <button type="submit" onclick="handleFormSubmission()">Upload</button>
+
+        <div id="loadingSpinner" style="display:none;">
+            Loading...
+        </div>
+    </form>
+
+    <script>
+        function handleFormSubmission() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+
+            setTimeout(function () {
+                window.location.href = '@Url.Content("/Identity/Account/Manage")';
+            }, 2000); // Reload after 2 seconds
+        }
+    </script>
+}
